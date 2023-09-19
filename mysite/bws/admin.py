@@ -2,11 +2,24 @@ from django.contrib import admin
 from .models import Product, Buyer, Seller, BuyerOrder, SellerOrder
 
 
+class BuyerOrderAdmin(admin.ModelAdmin):
+    list_display = (
+        'order_nr',
+        'buyer',
+        'product',
+    )
+
+
 class ProductAdmin(admin.ModelAdmin):
     readonly_fields = ('capacity_calculation',)
 
 
 class SellerOrderAdmin(admin.ModelAdmin):
+    list_display = (
+        'buyer_order',
+        'seller',
+        'production_product',
+    )
     readonly_fields = (
         'buyer_info',
         'buyer_product',
@@ -41,5 +54,5 @@ class SellerOrderAdmin(admin.ModelAdmin):
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Buyer)
 admin.site.register(Seller)
-admin.site.register(BuyerOrder)
+admin.site.register(BuyerOrder, BuyerOrderAdmin)
 admin.site.register(SellerOrder, SellerOrderAdmin)
