@@ -9,6 +9,21 @@ class Product(models.Model):
     height = models.IntegerField(verbose_name='Height(mm)', default=0)
     thickness = models.IntegerField(verbose_name='Thickness(mm)', default=0)
 
+    def capacity_calculation(self):
+        trailer_height = 2950
+        trailer_width = 2400
+        trailer_length = 13600
+        if self.width and self.length and self.height and self.thickness != 0:
+            calculate_height = int(trailer_height / (self.height + (self.thickness * 2)))
+            calculate_width = int(trailer_width / (self.width + (self.thickness * 2)))
+            calculate_length = int(trailer_length / (self.length + (self.thickness * 2)))
+            general_calculate = int(calculate_length * calculate_height * calculate_width)
+        else:
+            general_calculate = 0
+
+        return general_calculate
+
+
     def __str__(self):
         return self.name
 
