@@ -2,17 +2,32 @@ from django.db import models
 from django.core.validators import RegexValidator
 
 
+class Trailer(models.Model):
+    name = models.CharField(verbose_name='Trailer Name', max_length=200)
+    height = models.IntegerField(verbose_name='Height', default=0)
+    width = models.IntegerField(verbose_name='Width', default=0)
+    length = models.IntegerField(verbose_name='Length', default=0)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'Trailer'
+        verbose_name_plural = 'Trailers'
+
+
 class Product(models.Model):
     name = models.CharField(verbose_name='Name', max_length=200, unique=True)
     width = models.IntegerField(verbose_name='Width(mm)', default=0)
     length = models.IntegerField(verbose_name='Length(mm)', default=0)
     height = models.IntegerField(verbose_name='Height(mm)', default=0)
     thickness = models.IntegerField(verbose_name='Thickness(mm)', default=0)
+    trailer = models.ForeignKey(to=Trailer, verbose_name='Trailer', on_delete=models.SET_NULL, null=True, blank=True)
 
     def capacity_calculation(self):
-        trailer_height = 2950
-        trailer_width = 2400
-        trailer_length = 13600
+        trailer_height = self.trailer.height
+        trailer_width = self.trailer.width
+        trailer_length = self.trailer.length
         if self.width and self.length and self.height and self.thickness != 0:
             calculate_height = int(trailer_height / (self.height + (self.thickness * 2)))
             calculate_width = int(trailer_width / (self.width + (self.thickness * 2)))
@@ -111,6 +126,7 @@ class SellerOrder(models.Model):
     buyer_order = models.ForeignKey(to='BuyerOrder', on_delete=models.SET_NULL, null=True, blank=True)
     seller = models.ForeignKey(to='Seller', on_delete=models.SET_NULL, null=True, blank=True)
     production_product = models.ForeignKey(to='Product', verbose_name='Production Product', on_delete=models.SET_NULL, null=True, blank=True)
+    trailer = models.ForeignKey(to=Trailer, verbose_name='Trailer', on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.IntegerField(verbose_name='Quantity', default=0)
 
     ORDER_STATUS = (
@@ -122,6 +138,21 @@ class SellerOrder(models.Model):
     )
 
     status = models.CharField(verbose_name='Order Status', choices=ORDER_STATUS, default='a', max_length=1, blank=True)
+
+    def capacity_calculation(self):
+        trailer_height = self.trailer.height
+        trailer_width = self.trailer.width
+        trailer_length = self.trailer.length
+        if self.production_product and self.production_product.length and self.production_product.height and self.production_product.thickness != 0:
+            calculate_height = int(trailer_height / (self.production_product.height + (self.production_product.thickness * 2)))
+            calculate_width = int(trailer_width / (self.production_product.width + (self.production_product.thickness * 2)))
+            calculate_length = int(trailer_length / (self.production_product.length + (self.production_product.thickness * 2)))
+            general_calculate = int(calculate_length * calculate_height * calculate_width)
+        else:
+            general_calculate = 0
+
+        return general_calculate
+
 
     def __str__(self):
         return str(self.buyer_order)

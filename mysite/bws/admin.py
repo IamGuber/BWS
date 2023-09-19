@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, Buyer, Seller, BuyerOrder, SellerOrder
+from .models import Product, Buyer, Seller, BuyerOrder, SellerOrder, Trailer
 
 
 class BuyerOrderAdmin(admin.ModelAdmin):
@@ -21,6 +21,7 @@ class SellerOrderAdmin(admin.ModelAdmin):
         'production_product',
     )
     readonly_fields = (
+        'capacity_calculation',
         'buyer_info',
         'buyer_product',
         'get_capacity_calculation',
@@ -50,9 +51,31 @@ class SellerOrderAdmin(admin.ModelAdmin):
     buyer_info.short_description = 'Buyer'
     get_capacity_calculation.short_description = 'Capacity Calculation'
 
+    fieldsets = (
+        (None, {
+            'fields': (
+                'buyer_order',
+                'seller',
+                'production_product',
+                'trailer',
+                'quantity',
+                'capacity_calculation',
+                'buyer_info',
+                'buyer_product',
+                'get_capacity_calculation',
+            ),
+        }),
+        ('Status', {
+            'fields': (
+                'status',
+            ),
+        }),
+    )
+
 
 admin.site.register(Product, ProductAdmin)
 admin.site.register(Buyer)
 admin.site.register(Seller)
 admin.site.register(BuyerOrder, BuyerOrderAdmin)
 admin.site.register(SellerOrder, SellerOrderAdmin)
+admin.site.register(Trailer)
