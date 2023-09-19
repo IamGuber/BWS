@@ -23,7 +23,6 @@ class Product(models.Model):
 
         return general_calculate
 
-
     def __str__(self):
         return self.name
 
@@ -91,19 +90,15 @@ class BuyerOrder(models.Model):
 
     status = models.CharField(verbose_name='Order Status', choices=ORDER_STATUS, default='a', max_length=1, blank=True)
 
-
-
     def __str__(self):
         return self.order_nr
 
     def save(self, *args, **kwargs):
         if not self.order_nr:
-            last_order = BuyerOrder.objects.order_by('-id').first()
-            if last_order:
-                last_number = int(last_order.order_nr[3:])
-                new_number = last_number + 1
-            else:
-                new_number = 1
+            used_order_numbers = BuyerOrder.objects.values_list('order_nr', flat=True)
+            new_number = 1
+            while f'BWS{new_number:04}' in used_order_numbers:
+                new_number += 1
             self.order_nr = f'BWS{new_number:04}'
         super().save(*args, **kwargs)
 
