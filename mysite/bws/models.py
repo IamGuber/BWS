@@ -94,6 +94,7 @@ class BuyerOrder(models.Model):
     order_nr = models.CharField(max_length=10, unique=True, blank=True)
     buyer = models.ForeignKey(to='Buyer', on_delete=models.SET_NULL, null=True, blank=True)
     product = models.ForeignKey(to='Product', on_delete=models.SET_NULL, null=True, blank=True)
+    buyer_price = models.DecimalField(verbose_name='Buyer Price', max_digits=10, decimal_places=2, default=0.0)
 
     ORDER_STATUS = (
         ('a', 'Accepted'),
@@ -127,17 +128,23 @@ class SellerOrder(models.Model):
     seller = models.ForeignKey(to='Seller', on_delete=models.SET_NULL, null=True, blank=True)
     production_product = models.ForeignKey(to='Product', verbose_name='Production Product', on_delete=models.SET_NULL, null=True, blank=True)
     trailer = models.ForeignKey(to=Trailer, verbose_name='Trailer', on_delete=models.SET_NULL, null=True, blank=True)
+    seller_price = models.DecimalField(verbose_name='Seller Price', max_digits=10, decimal_places=2, default=0.0)
+    transport_price = models.DecimalField(verbose_name='Transport Price', max_digits=10, decimal_places=2, default=0.0)
     quantity = models.IntegerField(verbose_name='Quantity', default=0)
+    total_price = models.DecimalField(verbose_name='Total Price', max_digits=10, decimal_places=2, default=0.0)
 
     ORDER_STATUS = (
         ('a', 'Accepted'),
         ('p', 'In produce'),
-        ('l', 'Loaded'),
-        ('y', 'Delivered'),
-        ('d', 'Declined'),
     )
 
     status = models.CharField(verbose_name='Order Status', choices=ORDER_STATUS, default='a', max_length=1, blank=True)
+
+    def price_calculation(self):
+        price_from_seller = self.seller_price * self.quantity
+        total_price = self.total_price * self.quantity
+        profit = (total_price - price_from_seller) - self.transport_price
+        return profit
 
     def capacity_calculation(self):
         trailer_height = self.trailer.height
@@ -153,10 +160,13 @@ class SellerOrder(models.Model):
 
         return general_calculate
 
-
     def __str__(self):
         return str(self.buyer_order)
 
     class Meta:
         verbose_name = 'SellerOrder'
         verbose_name_plural = 'SellerOrders'
+
+
+class Order(models.Model):
+    ...

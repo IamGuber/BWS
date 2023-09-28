@@ -25,7 +25,21 @@ class SellerOrderAdmin(admin.ModelAdmin):
         'buyer_info',
         'buyer_product',
         'get_capacity_calculation',
+        'get_buyer_price',
+        'price_calculation',
     )
+
+    def price_calculation(self, obj):
+        return obj.price_calculation()
+
+    def capacity_calculation(self, obj):
+        return obj.capacity_calculation()
+
+    def get_buyer_price(self, obj):
+        if obj.buyer_order:
+            return obj.buyer_order.buyer_price
+        else:
+            return None
 
     def get_capacity_calculation(self, obj):
         if obj.buyer_order and obj.buyer_order.product:
@@ -47,9 +61,12 @@ class SellerOrderAdmin(admin.ModelAdmin):
         else:
             return 'No Buyer Order or Product'
 
+    price_calculation.short_description = 'Profit'
+    capacity_calculation.short_description = 'Modified Capacity Calculation'
     buyer_product.short_description = 'Product'
     buyer_info.short_description = 'Buyer'
-    get_capacity_calculation.short_description = 'Capacity Calculation'
+    get_capacity_calculation.short_description = 'Capacity Calculation from Buyer Order'
+    get_buyer_price.short_description = 'Buyer Price'
 
     fieldsets = (
         (None, {
@@ -58,11 +75,16 @@ class SellerOrderAdmin(admin.ModelAdmin):
                 'seller',
                 'production_product',
                 'trailer',
+                'seller_price',
+                'transport_price',
                 'quantity',
+                'price_calculation',
+                'total_price',
                 'capacity_calculation',
                 'buyer_info',
                 'buyer_product',
                 'get_capacity_calculation',
+                'get_buyer_price',
             ),
         }),
         ('Status', {
