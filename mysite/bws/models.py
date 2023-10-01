@@ -1,5 +1,43 @@
 from django.db import models
 from django.core.validators import RegexValidator
+from django.utils import timezone
+from django.db.models import signals
+
+
+class Transport(models.Model):
+    buyer_order = models.ForeignKey(to='BuyerOrder', unique=True, on_delete=models.CASCADE, null=True, blank=True)
+    transport_company = models.ForeignKey(to='TransportCompany', verbose_name='Transport Company', on_delete=models.CASCADE, null=True, blank=True)
+    trailer = models.ForeignKey(to='Trailer', verbose_name='Trailer', on_delete=models.CASCADE, null=True, blank=True)
+    truck_plates = models.CharField(verbose_name='Truck Plates', max_length=20, unique=True, blank=True)
+
+    def __str__(self):
+        return str(self.buyer_order)
+
+    class Meta:
+        verbose_name = 'Transport'
+        verbose_name_plural = 'Transports'
+
+
+class TransportCompany(models.Model):
+    name = models.CharField(verbose_name='Company', max_length=1000)
+    email = models.EmailField(verbose_name='Email')
+    tel_number = models.CharField(
+        verbose_name="Telephone Number",
+        max_length=15,
+        validators=[RegexValidator(regex=r'^\+370\d{8}$',
+                                   message="Lithuanian phone number must start with +370 and have 8 additional digits.",
+                                   code='invalid_phone_number'
+                                   )
+                    ]
+    )
+    info = models.TextField(verbose_name='Additional Information', max_length=5000)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = 'TransportCompany'
+        verbose_name_plural = 'TransportCompanies'
 
 
 class Trailer(models.Model):
@@ -91,16 +129,15 @@ class Seller(models.Model):
 
 
 class BuyerOrder(models.Model):
-    order_nr = models.CharField(max_length=10, unique=True, blank=True)
-    buyer = models.ForeignKey(to='Buyer', on_delete=models.SET_NULL, null=True, blank=True)
-    product = models.ForeignKey(to='Product', on_delete=models.SET_NULL, null=True, blank=True)
+    order_nr = models.CharField(verbose_name='Order Number', max_length=10, unique=True, blank=True)
+    buyer = models.ForeignKey(to='Buyer', verbose_name='Buyer', on_delete=models.SET_NULL, null=True, blank=True)
+    product = models.ForeignKey(to='Product',verbose_name='Product',  on_delete=models.SET_NULL, null=True, blank=True)
     buyer_price = models.DecimalField(verbose_name='Buyer Price', max_digits=10, decimal_places=2, default=0.0)
+    delivery_date_from = models.DateField(verbose_name='Delivery Date From', default=timezone.now())
+    delivery_date_to = models.DateField(verbose_name='Delivery Date To', default=timezone.now())
 
     ORDER_STATUS = (
         ('a', 'Accepted'),
-        ('p', 'In produce'),
-        ('l', 'Loaded'),
-        ('y', 'Delivered'),
         ('d', 'Declined'),
     )
 
@@ -116,15 +153,37 @@ class BuyerOrder(models.Model):
             while f'BWS{new_number:04}' in used_order_numbers:
                 new_number += 1
             self.order_nr = f'BWS{new_number:04}'
+
         super().save(*args, **kwargs)
+
+        order_instance, created = Order.objects.get_or_create(order_nr=self.order_nr)
+        order_instance.buyer_info = self
+        order_instance.order_status = self.status
+        order_instance.save()
+
+        def delete(self, *args, **kwargs):
+            if self.order_nr:
+                self.order_nr.delete()
+            super(BuyerOrder, self).delete(*args, **kwargs)
 
     class Meta:
         verbose_name = 'BuyerOrder'
         verbose_name_plural = 'BuyerOrders'
 
 
+def delete_order_on_buyer_order_delete(sender, instance, **kwargs):
+    try:
+        order_instance = Order.objects.get(order_nr=instance.order_nr)
+        order_instance.delete()
+    except Order.DoesNotExist:
+        pass
+
+
+signals.pre_delete.connect(delete_order_on_buyer_order_delete, sender=BuyerOrder)
+
+
 class SellerOrder(models.Model):
-    buyer_order = models.ForeignKey(to='BuyerOrder', on_delete=models.SET_NULL, null=True, blank=True)
+    buyer_order = models.ForeignKey(to='BuyerOrder', unique=True, on_delete=models.CASCADE, null=True, blank=True)
     seller = models.ForeignKey(to='Seller', on_delete=models.SET_NULL, null=True, blank=True)
     production_product = models.ForeignKey(to='Product', verbose_name='Production Product', on_delete=models.SET_NULL, null=True, blank=True)
     trailer = models.ForeignKey(to=Trailer, verbose_name='Trailer', on_delete=models.SET_NULL, null=True, blank=True)
@@ -132,13 +191,25 @@ class SellerOrder(models.Model):
     transport_price = models.DecimalField(verbose_name='Transport Price', max_digits=10, decimal_places=2, default=0.0)
     quantity = models.IntegerField(verbose_name='Quantity', default=0)
     total_price = models.DecimalField(verbose_name='Total Price', max_digits=10, decimal_places=2, default=0.0)
+    production_date = models.DateField(verbose_name='Production Date', default=timezone.now())
 
     ORDER_STATUS = (
         ('a', 'Accepted'),
         ('p', 'In produce'),
+        ('d', 'Declined'),
     )
 
     status = models.CharField(verbose_name='Order Status', choices=ORDER_STATUS, default='a', max_length=1, blank=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        order_instance, created = Order.objects.get_or_create(order_nr=self.buyer_order.order_nr)
+        order_instance.seller_info = self
+        order_instance.order_status = self.status
+        order_instance.price = self.total_price
+        order_instance.production_date = self.production_date
+        order_instance.save()
 
     def price_calculation(self):
         price_from_seller = self.seller_price * self.quantity
@@ -169,4 +240,26 @@ class SellerOrder(models.Model):
 
 
 class Order(models.Model):
-    ...
+    order_nr = models.CharField(verbose_name='Order Number', max_length=20, unique=True, blank=True, editable=False)
+    creating_date = models.DateTimeField(verbose_name='Create Date', default=timezone.now, editable=False)
+    buyer_info = models.ForeignKey(to='BuyerOrder', verbose_name='Buyer', on_delete=models.CASCADE, null=True, blank=True)
+    seller_info = models.ForeignKey(to='SellerOrder', verbose_name='Seller', on_delete=models.CASCADE, null=True, blank=True)
+    price = models.CharField(verbose_name='Price', max_length=10, blank=True, editable=False)
+    production_date = models.CharField(verbose_name='Production Date', max_length=10, blank=True, editable=False)
+
+    ORDER_STATUS = (
+        ('a', 'Accepted'),
+        ('p', 'In produce'),
+        ('l', 'Loaded'),
+        ('y', 'Delivered'),
+        ('d', 'Declined'),
+    )
+
+    order_status = models.CharField(verbose_name='Status', choices=ORDER_STATUS, max_length=20, blank=True, editable=False)
+
+    def __str__(self):
+        return self.order_nr
+
+    class Meta:
+        verbose_name = 'Order'
+        verbose_name_plural = 'Orders'
