@@ -4,25 +4,137 @@ from .models import Product, Buyer, Seller, BuyerOrder, SellerOrder, Trailer, Or
 
 class TransportAdmin(admin.ModelAdmin):
     list_display = (
-        'buyer_order',
+        'seller_order',
         'transport_company',
         'truck_plates',
+        'status',
     )
 
     readonly_fields = (
-
+        'display_seller_info',
+        'display_buyer_info',
+        'get_buyer_product',
+        'get_buyer_info',
+        'get_buyer_date',
+        'get_seller_info',
+        'get_production_product',
+        'get_trailer',
+        'get_transport_price',
+        'get_quantity',
+        'get_production_date',
     )
 
     fieldsets = (
         (None, {
             'fields': (
-                'buyer_order',
+                'seller_order',
                 'transport_company',
                 'trailer',
                 'truck_plates',
+                'loading_date',
+                'unloading_date',
+                'info',
+                'status',
+            )
+        }),
+        ('Production and Loading Information', {
+            'fields': (
+                'display_seller_info',
+                'get_seller_info',
+                'get_production_product',
+                'get_trailer',
+                'get_transport_price',
+                'get_quantity',
+                'get_production_date',
+            )
+        }),
+        ('Customer Information', {
+            'fields': (
+                'display_buyer_info',
+                'get_buyer_info',
+                'get_buyer_product',
+                'get_buyer_date',
             )
         }),
     )
+
+    def get_production_date(self, obj):
+        if obj.seller_order:
+            return obj.seller_order.production_date
+        return 'No Production Date'
+
+    def get_quantity(self, obj):
+        if obj.seller_order:
+            return obj.seller_order.quantity
+        return 'No Quantity Info'
+
+    def get_transport_price(self, obj):
+        if obj.seller_order:
+            return obj.seller_order.transport_price
+        return 'No Transport Price'
+
+    def get_trailer(self, obj):
+        if obj.seller_order:
+            return obj.seller_order.trailer
+        return 'No Trailer Info'
+
+    def get_production_product(self, obj):
+        if obj.seller_order:
+            return obj.seller_order.production_product
+        return 'No Production Product'
+
+    def get_seller_info(self, obj):
+        if obj.seller_order:
+            return obj.seller_order.seller.info
+        return 'No Seller Info'
+
+    def display_seller_info(self, obj):
+        if obj.seller_order:
+            return obj.seller_order.seller
+        return 'No Seller Order'
+
+    def get_week_numbers(self, start_date, end_date):
+        start_week_number = start_date.strftime('%W')
+        end_week_number = end_date.strftime('%W')
+        return f'Week {start_week_number} - Week {end_week_number}'
+
+    def get_buyer_date(self, obj):
+        if obj.seller_order.buyer_order and obj.seller_order.buyer_order.delivery_date_from and obj.seller_order.buyer_order.delivery_date_to:
+            start_date = obj.seller_order.buyer_order.delivery_date_from
+            end_date = obj.seller_order.buyer_order.delivery_date_to
+            return self.get_week_numbers(start_date, end_date)
+        else:
+            return 'No Delivery Date'
+
+    def get_buyer_product(self, obj):
+        if obj.seller_order:
+            return obj.seller_order.buyer_order.product
+        else:
+            return 'No Buyer Product'
+
+    def get_buyer_info(self, obj):
+        if obj.seller_order:
+            return obj.seller_order.buyer_order.buyer.info
+        else:
+            return 'No Buyer Information'
+
+    def display_buyer_info(self, obj):
+        if obj.seller_order:
+            return obj.seller_order.buyer_order.buyer.name
+        else:
+            return 'No Buyer Information'
+
+    display_buyer_info.short_description = 'Buyer'
+    get_buyer_info.short_description = 'Buyer Information'
+    get_buyer_product.short_description = 'Buyer Ordered Product'
+    get_buyer_date.short_description = 'Buyer Preferred Delivery Date'
+    display_seller_info.short_description = 'Seller'
+    get_seller_info.short_description = 'Seller Information'
+    get_production_product.short_description = 'Product for Loading'
+    get_trailer.short_description = 'Trailer'
+    get_transport_price.short_description = 'Counted Transport Price'
+    get_quantity.short_description = 'Loading Quantity'
+    get_production_date.short_description = 'Ready for Loading'
 
 
 class OrderAdmin(admin.ModelAdmin):
@@ -39,22 +151,58 @@ class OrderAdmin(admin.ModelAdmin):
         'price',
         'production_date',
         'get_buyer_date',
+        'get_transport_company',
+        'get_truck_plates',
+        'get_transport_load_date',
+        'get_transport_unload_date',
     )
 
     fieldsets = (
-        (None, {
+        ('Common Information', {
             'fields': (
                 'order_nr',
                 'creating_date',
-                'display_buyer_info',
-                'get_buyer_date',
-                'display_seller_info',
                 'price',
-                'production_date',
                 'order_status',
             )
         }),
+        ('Buyer Information', {
+            'fields': (
+                'display_buyer_info',
+                'get_buyer_date',
+            )
+        }),
+        ('Seller Information', {
+            'fields': (
+                'display_seller_info',
+                'production_date',
+            )
+        }),
+        ('Transport Information', {
+            'fields': (
+                'get_transport_company',
+                'get_truck_plates',
+                'get_transport_load_date',
+                'get_transport_unload_date',
+            )
+        })
     )
+
+    def get_transport_unload_date(self, obj):
+        if obj.transport_unload_date:
+            return obj.transport_load_date.unloading_date.strftime('%Y-%m-%d')
+
+    def get_transport_load_date(self, obj):
+        if obj.transport_load_date:
+            return obj.transport_load_date.loading_date.strftime('%Y-%m-%d')
+
+    def get_truck_plates(self, obj):
+        return obj.transport_plates.truck_plates
+
+    def get_transport_company(self, obj):
+        if obj.transport:
+            return obj.transport
+        return 'No Transport Company'
 
     def get_week_numbers(self, start_date, end_date):
         start_week_number = start_date.strftime('%W')
@@ -95,6 +243,24 @@ class BuyerOrderAdmin(admin.ModelAdmin):
         'product',
     )
 
+    fieldsets = (
+        (None, {
+            'fields': (
+                'order_nr',
+                'buyer',
+                'product',
+                'buyer_price',
+                'delivery_date_from',
+                'delivery_date_to',
+            )
+        }),
+        ('Status', {
+            'fields': (
+                'status',
+            ),
+        }),
+    )
+
 
 class ProductAdmin(admin.ModelAdmin):
     readonly_fields = ('capacity_calculation',)
@@ -114,6 +280,50 @@ class SellerOrderAdmin(admin.ModelAdmin):
         'get_buyer_price',
         'price_calculation',
         'get_buyer_date',
+    )
+
+    fieldsets = (
+        ('Common Information', {
+            'fields': (
+                'buyer_order',
+                'seller',
+                'production_product',
+                'trailer',
+            ),
+        }),
+        ('Counting', {
+            'fields': (
+                'seller_price',
+                'transport_price',
+                'quantity',
+                'total_price',
+            ),
+        }),
+        ('Counting Result', {
+            'fields': (
+                'price_calculation',
+                'capacity_calculation',
+            ),
+        }),
+        ('Date of Manufacture', {
+            'fields': (
+                'production_date',
+            ),
+        }),
+        ('Customer Information', {
+            'fields': (
+                'buyer_info',
+                'buyer_product',
+                'get_capacity_calculation',
+                'get_buyer_price',
+                'get_buyer_date',
+            ),
+        }),
+        ('Status', {
+            'fields': (
+                'status',
+            ),
+        }),
     )
 
     def get_week_numbers(self, start_date, end_date):
@@ -168,34 +378,6 @@ class SellerOrderAdmin(admin.ModelAdmin):
     buyer_info.short_description = 'Buyer'
     get_capacity_calculation.short_description = 'Capacity Calculation from Buyer Order'
     get_buyer_price.short_description = 'Buyer Price'
-
-    fieldsets = (
-        (None, {
-            'fields': (
-                'buyer_order',
-                'seller',
-                'production_product',
-                'trailer',
-                'seller_price',
-                'transport_price',
-                'quantity',
-                'price_calculation',
-                'total_price',
-                'capacity_calculation',
-                'buyer_info',
-                'buyer_product',
-                'get_capacity_calculation',
-                'get_buyer_price',
-                'get_buyer_date',
-                'production_date',
-            ),
-        }),
-        ('Status', {
-            'fields': (
-                'status',
-            ),
-        }),
-    )
 
 
 admin.site.register(Product, ProductAdmin)

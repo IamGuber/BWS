@@ -2,16 +2,39 @@ from django.db import models
 from django.core.validators import RegexValidator
 from django.utils import timezone
 from django.db.models import signals
+from django.core.exceptions import ValidationError
 
 
 class Transport(models.Model):
-    buyer_order = models.ForeignKey(to='BuyerOrder', unique=True, on_delete=models.CASCADE, null=True, blank=True)
+    seller_order = models.OneToOneField(to='SellerOrder', on_delete=models.SET_NULL, null=True, blank=True)
     transport_company = models.ForeignKey(to='TransportCompany', verbose_name='Transport Company', on_delete=models.CASCADE, null=True, blank=True)
-    trailer = models.ForeignKey(to='Trailer', verbose_name='Trailer', on_delete=models.CASCADE, null=True, blank=True)
+    trailer = models.ForeignKey(to='Trailer', verbose_name='Trailer', on_delete=models.SET_NULL, null=True, blank=True)
     truck_plates = models.CharField(verbose_name='Truck Plates', max_length=20, unique=True, blank=True)
+    loading_date = models.DateField(verbose_name='Loading Date', default=timezone.now)
+    unloading_date = models.DateField(verbose_name='Unloading Date', default=timezone.now)
+    info = models.TextField(verbose_name='Additional Information', max_length=2000, default='Transport Additional Information')
+
+    ORDER_STATUS = (
+        ('l', 'Loaded'),
+        ('y', 'Delivered'),
+        ('d', 'Declined'),
+    )
+
+    status = models.CharField(verbose_name='Status', choices=ORDER_STATUS, max_length=20, blank=True, editable=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        order_instance, created = Order.objects.get_or_create(order_nr=self.seller_order.buyer_order.order_nr)
+        order_instance.order_status = self.status
+        order_instance.transport = self.transport_company
+        order_instance.transport_plates = self
+        order_instance.transport_load_date = self
+        order_instance.transport_unload_date = self
+        order_instance.save()
 
     def __str__(self):
-        return str(self.buyer_order)
+        return str(self.seller_order)
 
     class Meta:
         verbose_name = 'Transport'
@@ -133,8 +156,8 @@ class BuyerOrder(models.Model):
     buyer = models.ForeignKey(to='Buyer', verbose_name='Buyer', on_delete=models.SET_NULL, null=True, blank=True)
     product = models.ForeignKey(to='Product',verbose_name='Product',  on_delete=models.SET_NULL, null=True, blank=True)
     buyer_price = models.DecimalField(verbose_name='Buyer Price', max_digits=10, decimal_places=2, default=0.0)
-    delivery_date_from = models.DateField(verbose_name='Delivery Date From', default=timezone.now())
-    delivery_date_to = models.DateField(verbose_name='Delivery Date To', default=timezone.now())
+    delivery_date_from = models.DateField(verbose_name='Delivery Date From', default=timezone.now)
+    delivery_date_to = models.DateField(verbose_name='Delivery Date To', default=timezone.now)
 
     ORDER_STATUS = (
         ('a', 'Accepted'),
@@ -183,7 +206,7 @@ signals.pre_delete.connect(delete_order_on_buyer_order_delete, sender=BuyerOrder
 
 
 class SellerOrder(models.Model):
-    buyer_order = models.ForeignKey(to='BuyerOrder', unique=True, on_delete=models.CASCADE, null=True, blank=True)
+    buyer_order = models.OneToOneField(to='BuyerOrder', on_delete=models.CASCADE, null=True, blank=True)
     seller = models.ForeignKey(to='Seller', on_delete=models.SET_NULL, null=True, blank=True)
     production_product = models.ForeignKey(to='Product', verbose_name='Production Product', on_delete=models.SET_NULL, null=True, blank=True)
     trailer = models.ForeignKey(to=Trailer, verbose_name='Trailer', on_delete=models.SET_NULL, null=True, blank=True)
@@ -191,7 +214,7 @@ class SellerOrder(models.Model):
     transport_price = models.DecimalField(verbose_name='Transport Price', max_digits=10, decimal_places=2, default=0.0)
     quantity = models.IntegerField(verbose_name='Quantity', default=0)
     total_price = models.DecimalField(verbose_name='Total Price', max_digits=10, decimal_places=2, default=0.0)
-    production_date = models.DateField(verbose_name='Production Date', default=timezone.now())
+    production_date = models.DateField(verbose_name='Production Date', default=timezone.now)
 
     ORDER_STATUS = (
         ('a', 'Accepted'),
@@ -246,6 +269,10 @@ class Order(models.Model):
     seller_info = models.ForeignKey(to='SellerOrder', verbose_name='Seller', on_delete=models.CASCADE, null=True, blank=True)
     price = models.CharField(verbose_name='Price', max_length=10, blank=True, editable=False)
     production_date = models.CharField(verbose_name='Production Date', max_length=10, blank=True, editable=False)
+    transport = models.ForeignKey(to='TransportCompany', verbose_name='Transport Information', on_delete=models.CASCADE, null=True, blank=True, related_name='orders_as_transport')
+    transport_plates = models.ForeignKey(to='Transport', verbose_name='Truck Plates', on_delete=models.CASCADE, null=True, blank=True, related_name='orders_as_plates')
+    transport_load_date = models.ForeignKey(to='Transport', verbose_name='Transport Loading Date', on_delete=models.CASCADE, null=True, blank=True, related_name='orders_as_load_date')
+    transport_unload_date = models.ForeignKey(to='Transport', verbose_name='Transport Unloading Date', on_delete=models.CASCADE, null=True, blank=True, related_name='orders_as_unload_date')
 
     ORDER_STATUS = (
         ('a', 'Accepted'),
