@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% block 'title' %}{% endblock %}
+  <link rel="stylesheet" href="{% static 'style.css' %}">
+
+</head>
+<body>
+  <div class="upper-panel">
+    <div class="logo">BWS</div>
+
+    <div class="buttons">
+      <button class="button">Sign Up</button>
+      <button class="button">Log In</button>
+    </div>
+  </div>
+
+  <div class="menu-bar">
+    <a href="{% url 'index' %}" class="menu-item">Home</a>
+    <a href="#" class="menu-item">About</a>
+    <a href="#" class="menu-item">Products</a>
+    <a href="#" class="menu-item">Contact</a>
+  </div>
+
+    {% block 'content' %}{% endblock %}
+
+</body>
+</html>

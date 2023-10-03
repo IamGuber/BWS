@@ -1,0 +1,88 @@
+.upper-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #FE0505;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 3px;
+    position: fixed;
+    top: 5px;
+    left: 8px;
+    right: 8px;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.button {
+    padding: 8px 12px;
+    background-color: #427150;
+    color: #fff;
+    border: None;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.menu-bar {
+    background-color: #427150;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    border-radius: 3px;
+    position: fixed;
+    top: 56px;
+    left: 8px;
+    right: 8px;
+}
+
+.menu-item {
+    padding: 10px 20px;
+    color: #fff;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+.menu-item:hover {
+    background-color: #FE0505;
+    border-radius: 4px;
+}
+
+.content {
+    border: 2px solid #B3B3B3;
+    border-radius: 3px;
+    margin-top: 100px;
+}
+
+.content2 {
+    border: 2px solid #B3B3B3;
+    border-radius: 3px;
+}
+
+@keyframes logoAnimation {
+    0% {
+    transform: rotate(0deg);
+    }
+    100% {
+    transform: rotate(360deg);
+    }
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    animation: logoAnimation 5s linear infinite; /* Adjust the duration and animation type as needed */
+}
