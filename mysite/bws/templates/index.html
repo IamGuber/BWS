@@ -1,17 +1,14 @@
 {% extends 'base.html' %}
 {% block 'head' %}{% endblock %}
-{% block 'title' %}<title>Black Wired Cloud</title>{% endblock %}
+{% block 'title' %}<title>Black Wired Sky</title>{% endblock %}
 {% block 'menu' %}{% endblock %}
 {% block 'content' %}
 <div class="content">
-    <ul>Clients:
-        <li>{{ clients }}</li>
-    </ul>
-  </div>
-
-<div class="content2">
-    <ul>Partners:
-        <li>{{ partners }}</li>
+    <h1>Most Popular Orders</h1>
+    <ul class="content-list">
+        {% for order in orders %}
+        <div class="content2">{{ order.buyer_info.product }}</div>
+        {% endfor %}
     </ul>
   </div>
 {% endblock %}

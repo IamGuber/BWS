@@ -155,6 +155,7 @@ class OrderAdmin(admin.ModelAdmin):
         'get_truck_plates',
         'get_transport_load_date',
         'get_transport_unload_date',
+        'get_product',
     )
 
     fieldsets = (
@@ -162,6 +163,7 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': (
                 'order_nr',
                 'creating_date',
+                'get_product',
                 'price',
                 'order_status',
             )
@@ -187,6 +189,10 @@ class OrderAdmin(admin.ModelAdmin):
             )
         })
     )
+
+    def get_product(self, obj):
+        if obj.buyer_info:
+            return obj.buyer_info.product
 
     def get_transport_unload_date(self, obj):
         if obj.transport_unload_date:
@@ -231,6 +237,7 @@ class OrderAdmin(admin.ModelAdmin):
         else:
             return 'No Buyer Order'
 
+    get_product.short_description = 'Ordered Product'
     get_buyer_date.short_description = 'Preferred delivery date '
     display_buyer_info.short_description = 'Buyer'
     display_seller_info.short_description = 'Seller'

@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   {% block 'title' %}{% endblock %}
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  <link rel="icon" type="image/x-icon" href="{% static 'images/favicon.ico' %}">
 
 </head>
 <body>
@@ -27,6 +28,28 @@
   </div>
 
     {% block 'content' %}{% endblock %}
+
+<footer>
+  <div class="footer">
+
+    <div class="footer-logo">
+      <img src="{% static 'images/logo.png' %}">
+      <h2>Black Wired Sky</h2>
+    </div>
+
+    <div class="footer-general">
+      <div class="footer-about">
+        <h3>About</h3>
+        <p>The company has been established for 10 years. We have 3 own factories. We cooperate with our partners from various countries. We make boards from various types of wood.</p>
+      </div>
+
+      <div class="footer-Contact">
+        <h3>Contact</h3>
+          <p>Black Wired Sky, UAB<br>Company ID: 123456789<br>Mėnulio g. 12-1, LT-11123, Vilnius.<br>Tel.: +37060011010<br>Email: bws@gmail.com</p>
+      </div>
+    </div>
+  </div>
+</footer>
 
 </body>
 </html>

@@ -2,7 +2,6 @@ from django.db import models
 from django.core.validators import RegexValidator
 from django.utils import timezone
 from django.db.models import signals
-from django.core.exceptions import ValidationError
 
 
 class Transport(models.Model):

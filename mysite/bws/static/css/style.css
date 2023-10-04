@@ -67,9 +67,17 @@
     margin-top: 100px;
 }
 
+.content-list {
+    list-style-type: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: nowrap;
+}
+
 .content2 {
     border: 2px solid #B3B3B3;
     border-radius: 3px;
+    margin-right: 10px;
 }
 
 @keyframes logoAnimation {
@@ -85,4 +93,38 @@
     font-size: 24px;
     font-weight: bold;
     animation: logoAnimation 5s linear infinite; /* Adjust the duration and animation type as needed */
+}
+
+.footer {
+    border: 2px solid #FE0505;
+    border-radius: 3px;
+    background-color: #FE0505;
+}
+
+.footer-logo {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+.footer-logo img {
+    width: 20%;
+    height: 50px;
+    vertical-align: middle;
+}
+
+.footer-logo h2 {
+    display: inline-block;
+    margin-left: 10px;
+}
+
+.footer-general {
+    display: flex;
+    justify-content: space-between;
+}
+
+.footer-about,
+.footer-Contact {
+    flex: 0 0 calc(50% - 20px);
+    padding: 0 10%;
+    box-sizing: border-box;
 }

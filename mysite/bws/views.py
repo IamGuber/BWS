@@ -1,15 +1,13 @@
 from django.shortcuts import render
 from django.http import HttpResponse
-from .models import Buyer, Seller
+from .models import  Order
 
 
 def index(request):
-    clients = Buyer.objects.all().count()
-    partners = Seller.objects.all().count()
+    orders = Order.objects.all()
 
     context = {
-        'clients': clients,
-        'partners': partners,
+        'orders': orders,
     }
 
     return render(request, 'index.html', context=context)
