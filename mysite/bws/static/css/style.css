@@ -2,12 +2,12 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #FE0505;
+    background-color: #ab0a0a;
     color: #fff;
     padding: 10px 20px;
     border-radius: 3px;
     position: fixed;
-    top: 5px;
+    top: 0px;
     left: 8px;
     right: 8px;
 }
@@ -23,6 +23,7 @@
 }
 
 .button {
+    text-decoration: none;
     padding: 8px 12px;
     background-color: #427150;
     color: #fff;
@@ -40,13 +41,18 @@
 .menu-bar {
     background-color: #427150;
     display: flex;
-    justify-content: left;
+    justify-content: space-between;
     align-items: center;
     border-radius: 3px;
     position: fixed;
-    top: 56px;
+    top: 51px;
     left: 8px;
     right: 8px;
+}
+
+.menu-items {
+    display: flex;
+    align-items: center;
 }
 
 .menu-item {
@@ -54,17 +60,63 @@
     color: #fff;
     text-decoration: none;
     transition: background-color 0.3s;
+    margin-right: 10px;
 }
 
 .menu-item:hover {
-    background-color: #FE0505;
+    background-color: #ab0a0a;
+    border-radius: 4px;
+}
+
+.menu-user-icon {
+    color: #fff;
+    margin-right: 10px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.menu-user-icon svg {
+    margin-right: 5px;
+}
+
+.menu-user-icon:hover {
+    color: #ab0a0a;
+}
+
+.menu-user-logout {
+    color: #fff;
+    margin-right: 10px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+}
+
+.menu-user-logout:hover {
+    color: #ab0a0a;
+}
+
+.menu-user-items {
+    display: flex;
+}
+
+.menu-user-item {
+    padding: 10px 20px;
+    color: #fff;
+    text-decoration: none;
+    transition: background-color 0.3s
+    margin-right: 10px;
+}
+
+.menu-user-item:hover {
+    background-color: #ab0a0a;
     border-radius: 4px;
 }
 
 .content {
     border: 2px solid #B3B3B3;
     border-radius: 3px;
-    margin-top: 100px;
+    margin-top: 92px;
 }
 
 .content-list {
@@ -77,7 +129,7 @@
 .content2 {
     border: 2px solid #B3B3B3;
     border-radius: 3px;
-    margin-right: 10px;
+    margin-left: 20px;
 }
 
 @keyframes logoAnimation {
@@ -96,9 +148,9 @@
 }
 
 .footer {
-    border: 2px solid #FE0505;
+    border: 2px solid #ab0a0a;
     border-radius: 3px;
-    background-color: #FE0505;
+    background-color: #ab0a0a;
 }
 
 .footer-logo {
@@ -110,6 +162,7 @@
     width: 20%;
     height: 50px;
     vertical-align: middle;
+    border-radius: 8px;
 }
 
 .footer-logo h2 {
@@ -123,8 +176,42 @@
 }
 
 .footer-about,
-.footer-Contact {
+.footer-Contacts {
     flex: 0 0 calc(50% - 20px);
     padding: 0 10%;
     box-sizing: border-box;
+}
+
+.sidebar {
+    width: 200px;
+    background-color: #f2f2f2;
+}
+
+.container-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.container {
+    text-align: center;
+    width: 350px;
+    margin: 10px;
+}
+
+.container img {
+    width: 350px;
+    height: 350px;
+    object-fit: cover;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+}
+
+.container a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    display: block;
 }

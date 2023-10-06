@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block 'head' %}{% endblock %}
+{% block 'title' %}<title>Black Wired Sky: Product</title>{% endblock %}
+{% block 'menu' %}{% endblock %}
+{% block 'content' %}
+<div class="content">
+    <div class="product">
+        <h1>{{ product.name }}</h1>
+        <h4>
+            {% if product.product_image %}
+            <img src="{{ product.product_image.url }}">
+            {% else %}
+            <img src="{% static 'images/no-image.png' %}">
+            {% endif %}
+        </h4>
+        <h2>Specifications:</h2>
+        <p><strong>Width:</strong> {{ product.width }} mm.</p>
+        <p><strong>Length:</strong> {{ product.length }} mm.</p>
+        <p><strong>Height:</strong> {{ product.height }} mm.</p>
+        <p><strong>Thickness:</strong> {{ product.thickness }} mm.</p>
+    </div>
+</div>
+{% endblock %}

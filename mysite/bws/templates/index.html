@@ -7,7 +7,9 @@
     <h1>Most Popular Orders</h1>
     <ul class="content-list">
         {% for order in orders %}
-        <div class="content2">{{ order.buyer_info.product }}</div>
+        <div class="content2">
+            <a href="{% url 'product' order.buyer_info.product.id  %}">{{ order.buyer_info.product }}</a>
+        </div>
         {% endfor %}
     </ul>
   </div>

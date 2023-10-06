@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block 'head' %}{% endblock %}
+{% block 'title' %}<title>Black Wired Sky: Products</title>{% endblock %}
+{% block 'menu' %}{% endblock %}
+{% block 'content' %}
+<div class="content">
+    <ul class="content-list">
+        <div class="sidebar">
+            <h3 style="margin-left: 10px;">Filters:</h3>
+            <form method="get">
+                {{ form.as_p }}
+                <button type="submit">Apply Filters</button>
+            </form>
+        </div>
+        <div class="container-wrapper">
+            {% for product in products %}
+            <div class="container">
+                <a href="{% url 'product' product.id %}">{{ product.name }}</a>
+                {% if product.product_image %}
+                <img src="{{ product.product_image.url }}">
+                {% else %}
+                <img src="{% static 'images/no-image.png' %}">
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </ul>
+</div>
+{% endblock %}
