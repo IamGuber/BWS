@@ -2,6 +2,8 @@ from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from .models import Order, Product
 from .forms import ProductFilterForm
+from django.views import generic
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 def index(request):
@@ -49,3 +51,13 @@ def product(request, product_id):
     }
 
     return render(request, 'product.html', context=context)
+
+
+class UserOrdersListView(LoginRequiredMixin, generic.ListView):
+    model = Order
+    template_name = 'user_orders.html'
+    context_object_name = 'user_orders'
+
+    def get_queryset(self):
+        queryset = Order.objects.filter(user_client=self.request.user)
+        return queryset

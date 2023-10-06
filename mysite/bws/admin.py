@@ -156,6 +156,7 @@ class OrderAdmin(admin.ModelAdmin):
         'get_transport_load_date',
         'get_transport_unload_date',
         'get_product',
+        'user_client',
     )
 
     fieldsets = (
@@ -166,6 +167,7 @@ class OrderAdmin(admin.ModelAdmin):
                 'get_product',
                 'price',
                 'order_status',
+                'user_client',
             )
         }),
         ('Buyer Information', {

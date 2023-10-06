@@ -2,6 +2,7 @@ from django.db import models
 from django.core.validators import RegexValidator
 from django.utils import timezone
 from django.db.models import signals
+from django.contrib.auth.models import User
 
 
 class Transport(models.Model):
@@ -119,6 +120,7 @@ class Buyer(models.Model):
                                    )
                     ]
     )
+    user_client = models.OneToOneField(to=User, verbose_name='User Client', on_delete=models.SET_NULL, null=True, blank=True)
     info = models.TextField(verbose_name='Additional Information', max_length=5000)
 
     def __str__(self):
@@ -182,6 +184,7 @@ class BuyerOrder(models.Model):
         order_instance, created = Order.objects.get_or_create(order_nr=self.order_nr)
         order_instance.buyer_info = self
         order_instance.order_status = self.status
+        order_instance.user_client = self.buyer.user_client
         order_instance.save()
 
         def delete(self, *args, **kwargs):
@@ -273,6 +276,7 @@ class Order(models.Model):
     transport_plates = models.ForeignKey(to='Transport', verbose_name='Truck Plates', on_delete=models.CASCADE, null=True, blank=True, related_name='orders_as_plates')
     transport_load_date = models.ForeignKey(to='Transport', verbose_name='Transport Loading Date', on_delete=models.CASCADE, null=True, blank=True, related_name='orders_as_load_date')
     transport_unload_date = models.ForeignKey(to='Transport', verbose_name='Transport Unloading Date', on_delete=models.CASCADE, null=True, blank=True, related_name='orders_as_unload_date')
+    user_client = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
 
     ORDER_STATUS = (
         ('a', 'Accepted'),
