@@ -215,3 +215,17 @@
     font-weight: bold;
     display: block;
 }
+
+.table {
+    width: 600px;
+}
+
+.th {
+    text-align: left;
+}
+
+.table,
+th,
+td {
+    border: 1px solid #000;
+}

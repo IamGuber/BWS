@@ -3,16 +3,35 @@
 {% block 'head' %}{% endblock %}
 {% block 'title' %}<title>Black Wired Sky: Orders</title>{% endblock %}
 {% block 'menu' %}{% endblock %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
 {% block 'content' %}
 <div class="content">
-    <ul class="content-list">
-        <div class="container-wrapper">
+    <h2>My Orders:</h2>
+        <table>
+            <tr>
+                <th>Order Number</th>
+                <th>Price</th>
+                <th>Production Date</th>
+                <th>Truck Plates</th>
+                <th>Loading Date</th>
+                <th>Delivery Date</th>
+                <th>Order Status</th>
+            </tr>
             {% for order in user_orders %}
-                {{ order.order_nr }}<br>
-                {{ order.price }}<br>
-                {{ order.order_status }}
+            <tr>
+                <td>{{ order.order_nr }}</td>
+                {% if order.price %}
+                <td>{{ order.price }}</td>
+                {% else %}
+                <td></td>
+                {% endif %}
+                <td>{{ order.production_date }}</td>
+                <td>{{ order.transport_plates.truck_plates }}</td>
+                <td>{{ order.transport_load_date.loading_date }}</td>
+                <td>{{ order.transport_unload_date.unloading_date }}</td>
+                <td>{{ order.get_order_status_display }}</td>
+            </tr>
             {% endfor %}
-        </div>
-    </ul>
+        </table>
 </div>
 {% endblock %}

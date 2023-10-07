@@ -1,5 +1,6 @@
 from django.contrib import admin
 from .models import Product, Buyer, Seller, BuyerOrder, SellerOrder, Trailer, Order, Transport, TransportCompany
+from .forms import BuyerOrderForm
 
 
 class TransportAdmin(admin.ModelAdmin):
@@ -156,7 +157,6 @@ class OrderAdmin(admin.ModelAdmin):
         'get_transport_load_date',
         'get_transport_unload_date',
         'get_product',
-        'user_client',
     )
 
     fieldsets = (
@@ -167,7 +167,6 @@ class OrderAdmin(admin.ModelAdmin):
                 'get_product',
                 'price',
                 'order_status',
-                'user_client',
             )
         }),
         ('Buyer Information', {
@@ -246,6 +245,7 @@ class OrderAdmin(admin.ModelAdmin):
 
 
 class BuyerOrderAdmin(admin.ModelAdmin):
+    form = BuyerOrderForm
     list_display = (
         'order_nr',
         'buyer',
