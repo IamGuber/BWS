@@ -218,7 +218,7 @@
 
 .table {
     width: 600px;
-}
+r}
 
 .th {
     text-align: left;
@@ -228,4 +228,49 @@
 th,
 td {
     border: 1px solid #000;
+}
+
+.footer-info {
+    margin-top: 0;
+    background-color: #427150;
+    border-radius: 3px;
+    height: 20px;
+    width: auto;
+    text-align: center;
+}
+
+.content-alert {
+    margin-top: 100px;
+}
+
+.product-image {
+    width: 200px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+.content-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 50px;
+}
+
+.content2 {
+    width: 20%;
+    margin-bottom: 20px;
+}
+
+.product-info {
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.product-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    text-decoration: none;
+    margin: 20px;
 }

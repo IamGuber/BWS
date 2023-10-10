@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block 'head' %}{% endblock %}
 {% block 'title' %}<title>Black Wired Sky</title>{% endblock %}
 {% block 'menu' %}{% endblock %}
@@ -8,7 +9,16 @@
     <ul class="content-list">
         {% for order in orders %}
         <div class="content2">
-            <a href="{% url 'product' order.buyer_info.product.id  %}">{{ order.buyer_info.product }}</a>
+            <a href="{% url 'product' order.buyer_info.product.id  %}" class="product-link">
+                <div class="product-info">
+                {{ order.buyer_info.product }}
+                </div>
+                {% if order.buyer_info.product.product_image %}
+                    <img src="{{ order.buyer_info.product.product_image.url }}" class="product-image">
+                {% else %}
+                    <img src="{% static 'images/no-image.png' %}" class="product-image">
+                {% endif %}
+            </a>
         </div>
         {% endfor %}
     </ul>

@@ -17,7 +17,7 @@
     <p></p>
     {% else %}
     <div class="buttons">
-      <button class="button">Sign Up</button>
+      <a href="{% url 'register' %}" class="button">Sign Up</a>
       <a href="{% url 'login' %}" class="button">Log In</a>
     </div>
     {% endif %}
@@ -49,7 +49,13 @@
       {% endif %}
     </div>
   </div>
-
+    {% if messages %}
+    {% for message in messages %}
+    <div class="content-alert">
+      {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
     {% block 'content' %}{% endblock %}
 
 <footer>
@@ -71,6 +77,9 @@
           <p>Black Wired Sky, UAB<br>Company ID: 123456789<br>Mėnulio g. 12-1, LT-11123, Vilnius.<br>Tel.: +37060011010<br>Email: bws@gmail.com</p>
       </div>
     </div>
+  </div>
+  <div class="footer-info">
+    <p>© 2023 Black Wired Sky</p>
   </div>
 </footer>
 
