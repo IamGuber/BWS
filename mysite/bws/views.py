@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from .models import Order, Product
-from .forms import ProductFilterForm, BuyerOrderForm
+from .forms import ProductFilterForm, BuyerOrderForm, UserUpdateForm, BuyerUpdateForm
 from django.views import generic
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.decorators.csrf import csrf_protect
@@ -9,6 +9,7 @@ from django.shortcuts import redirect
 from django.contrib.auth.forms import User
 from django.views.generic.edit import FormMixin
 from django.urls import reverse
+from django.contrib.auth.decorators import login_required
 
 
 def index(request):
@@ -115,3 +116,26 @@ def register(request):
             return redirect('register')
     else:
         return render(request, 'registration/register.html')
+
+
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        user_form = UserUpdateForm(request.POST, instance=request.user)
+        buyer_form = BuyerUpdateForm(request.POST, instance=request.user.buyer)
+        if user_form.is_valid() and buyer_form.is_valid():
+            request.user.email = user_form.cleaned_data['email']
+            user_form.save()
+            buyer_form.save()
+            messages.success(request, f'Profile updated!')
+            return redirect('profile')
+
+    user_form = UserUpdateForm(instance=request.user)
+    buyer_form = BuyerUpdateForm(instance=request.user.buyer)
+
+    context = {
+        'user_form': user_form,
+        'buyer_form': buyer_form,
+    }
+
+    return render(request, 'profile.html', context=context)

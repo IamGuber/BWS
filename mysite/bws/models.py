@@ -111,10 +111,11 @@ class Product(models.Model):
 
 class Buyer(models.Model):
     name = models.CharField(verbose_name='Name', max_length=1000)
-    email = models.EmailField(verbose_name='Email')
+    email = models.EmailField(verbose_name='Email', blank=True)
     tel_number = models.CharField(
         verbose_name="Telephone Number",
         max_length=15,
+        blank=True,
         validators=[RegexValidator(regex=r'^\+370\d{8}$',
                                    message="Lithuanian phone number must start with +370 and have 8 additional digits.",
                                    code='invalid_phone_number'
@@ -122,7 +123,7 @@ class Buyer(models.Model):
                     ]
     )
     user_client = models.OneToOneField(to=User, verbose_name='User Client', on_delete=models.SET_NULL, null=True, blank=True)
-    info = models.TextField(verbose_name='Additional Information', max_length=5000)
+    info = models.TextField(verbose_name='Additional Information', max_length=5000, blank=True)
 
     def __str__(self):
         return self.name
