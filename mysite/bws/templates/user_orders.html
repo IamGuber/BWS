@@ -7,31 +7,58 @@
 {% block 'content' %}
 <div class="content">
     <h2>My Orders:</h2>
-        <table>
-            <tr>
-                <th>Order Number</th>
-                <th>Price</th>
-                <th>Production Date</th>
-                <th>Truck Plates</th>
-                <th>Loading Date</th>
-                <th>Delivery Date</th>
-                <th>Order Status</th>
-            </tr>
-            {% for order in user_orders %}
-            <tr>
-                <td>{{ order.order_nr }}</td>
-                {% if order.price %}
-                <td>{{ order.price }}</td>
-                {% else %}
-                <td></td>
-                {% endif %}
-                <td>{{ order.production_date }}</td>
-                <td>{{ order.transport_plates.truck_plates }}</td>
-                <td>{{ order.transport_load_date.loading_date }}</td>
-                <td>{{ order.transport_unload_date.unloading_date }}</td>
-                <td>{{ order.get_order_status_display }}</td>
-            </tr>
-            {% endfor %}
-        </table>
+
+    <form method="get" action="{% url 'user_orders' %}">
+        <label for="order_number">Order Number:</label>
+        <input type="text" id="order_number" name="order_number" value="{{ request.GET.order_number }}">
+
+        <label for="order_status">Order Status:</label>
+        <select id="order_status" name="order_status">
+            <option value="">All</option>
+            <option value="a" {% if request.GET.order_status == 'a' %}selected{% endif %}>Accepted</option>
+            <option value="p" {% if request.GET.order_status == 'p' %}selected{% endif %}>In produce</option>
+            <option value="l" {% if request.GET.order_status == 'l' %}selected{% endif %}>Loaded</option>
+            <option value="y" {% if request.GET.order_status == 'y' %}selected{% endif %}>Delivered</option>
+            <option value="d" {% if request.GET.order_status == 'd' %}selected{% endif %}>Declined</option>
+        </select>
+
+        <label for="delivery_date">Delivery Date:</label>
+        <input type="date" id="delivery_date" name="delivery_date" value="{{ request.GET.delivery_date }}">
+
+        <button type="submit">Filter</button>
+    </form>
+
+    <hr>
+
+    <table>
+        <tr>
+            <th>Order Number</th>
+            <th>Price</th>
+            <th>Production Date</th>
+            <th>Truck Plates</th>
+            <th>Loading Date</th>
+            <th>Delivery Date</th>
+            <th>Order Status</th>
+        </tr>
+        {% for order in user_orders %}
+        <tr>
+            <td>{{ order.order_nr }}</td>
+            {% if order.price %}
+            <td>{{ order.price }}</td>
+            {% else %}
+            <td></td>
+            {% endif %}
+            <td>{{ order.production_date }}</td>
+            <td>{{ order.transport_plates.truck_plates }}</td>
+            <td>{{ order.transport_load_date.loading_date }}</td>
+            <td>{{ order.transport_unload_date.unloading_date }}</td>
+            <td>{{ order.get_order_status_display }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="7">No orders found.</td>
+        </tr>
+        {% endfor %}
+    </table>
 </div>
 {% endblock %}

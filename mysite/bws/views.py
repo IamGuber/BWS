@@ -38,13 +38,13 @@ class ProductsListView(generic.ListView):
             thickness = form.cleaned_data.get('thickness')
 
             if width:
-                queryset = queryset.filter(width__gte=width)
+                queryset = queryset.filter(width__exact=width)
             if length:
-                queryset = queryset.filter(length__gte=length)
+                queryset = queryset.filter(length__exact=length)
             if height:
-                queryset = queryset.filter(height__gte=height)
+                queryset = queryset.filter(height__exact=height)
             if thickness:
-                queryset = queryset.filter(thickness__gte=thickness)
+                queryset = queryset.filter(thickness__exact=thickness)
 
         return queryset
 
@@ -89,6 +89,17 @@ class UserOrdersListView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         queryset = Order.objects.filter(user_client=self.request.user)
+        order_number = self.request.GET.get('order_number')
+        order_status = self.request.GET.get('order_status')
+        delivery_date = self.request.GET.get('delivery_date')
+
+
+        if order_number:
+            queryset = queryset.filter(order_nr__icontains=order_number)
+        if order_status:
+            queryset = queryset.filter(order_status=order_status)
+        if delivery_date:
+            queryset = queryset.filter(transport_unload_date__unloading_date=delivery_date)
         return queryset
 
 

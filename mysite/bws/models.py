@@ -85,7 +85,7 @@ class Product(models.Model):
     height = models.IntegerField(verbose_name='Height(mm)', default=0)
     thickness = models.IntegerField(verbose_name='Thickness(mm)', default=0)
     trailer = models.ForeignKey(to=Trailer, verbose_name='Trailer', on_delete=models.SET_NULL, null=True, blank=True)
-    product_image = models.ImageField(verbose_name='Product Image', upload_to='media', null=True, blank=True)
+    product_image = models.ImageField(verbose_name='Product Image', upload_to='products', null=True, blank=True)
 
     def capacity_calculation(self):
         trailer_height = self.trailer.height

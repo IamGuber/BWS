@@ -14,4 +14,11 @@ def create_profile(sender, instance, created, **kwargs):
 
 @receiver(post_save, sender=User)
 def save_profile(sender, instance, **kwargs):
-    instance.buyer.save()
+    try:
+        if instance.buyer:
+            instance.buyer.save()
+    except Buyer.DoesNotExist:
+        pass
+    else:
+        if instance.buyer:
+            instance.buyer.save()

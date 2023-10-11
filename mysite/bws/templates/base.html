@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 {% load static %}
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head>
 
   <meta charset="UTF-8">
@@ -26,9 +26,9 @@
   <div class="menu-bar">
     <div class="menu-items">
       <a href="{% url 'index' %}" class="menu-item">Home</a>
-      <a href="#" class="menu-item">About</a>
+      <a href="#content3" class="menu-item">About</a>
       <a href="{% url 'products' %}" class="menu-item">Products</a>
-      <a href="#" class="menu-item">Contacts</a>
+      <a href="#footer" class="menu-item">Contacts</a>
     </div>
     <div class="menu-user-items">
       {% if user.is_authenticated %}
@@ -58,12 +58,41 @@
     {% endif %}
     {% block 'content' %}{% endblock %}
 
+<div class="content3" id="content3">
+  <div class="video-container">
+    <video autoplay muted loop id="background-video">
+      <source src="{% static 'factory.mp4' %}" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+    <div class="overlay">
+      <div class="content-info">
+        <div class="credits">
+          <h2>About Us</h2>
+          <p>Welcome to Black Wired Sky, where craftsmanship meets innovation. With a rich legacy spanning a decade, we take pride in being pioneers in the woodworking industry. <br> Our commitment to quality and excellence has propelled us to the forefront of the market.</p>
+          <h3>Our Expertise</h3>
+          <p>At Black Wired Sky, we house a team of dedicated artisans and craftsmen who possess a deep understanding of woodwork. <br> With three state-of-the-art factories at our disposal, we blend traditional techniques with cutting-edge technology to create exquisite wooden boards.</p>
+          <h3>Global Collaboration</h3>
+          <p>We believe in the power of collaboration. Over the years, we have cultivated strong partnerships with esteemed colleagues from various countries. <br> This global network not only enriches our knowledge but also allows us to bring you the finest materials and techniques from around the world.</p>
+          <h3>Our Craft</h3>
+          <p>What sets us apart is our passion for diversity. We specialize in crafting boards from an extensive range of wood types, each possessing unique qualities. <br> From the robust durability of oak to the elegant grains of cherry, our creations reflect the beauty and strength of nature.</p>
+          <h3>Quality Assurance</h3>
+          <p>Quality is at the heart of everything we do. Each board that leaves our workshop undergoes rigorous testing and inspection. We guarantee not just products, but experiences – a testament to our unwavering commitment to your satisfaction.</p>
+          <h3>Join Our Journey</h3>
+          <p>We invite you to join us on this extraordinary journey through the world of wood. <br> Whether you are an architect envisioning a masterpiece, a homeowner adding warmth to your space, or a business seeking quality materials, Black Wired Sky is your trusted partner. <br> Discover the beauty of bespoke woodwork with us. Experience the essence of craftsmanship, experience Black Wired Sky.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <footer>
-  <div class="footer">
+  <div class="footer" id="footer">
 
     <div class="footer-logo">
-      <img src="{% static 'images/logo.png' %}">
-      <h2>Black Wired Sky</h2>
+      <a href="#" class="no-link-style">
+        <img src="{% static 'images/logo.png' %}">
+        <h2>Black Wired Sky</h2>
+      </a>
     </div>
 
     <div class="footer-general">
