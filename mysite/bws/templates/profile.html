@@ -6,12 +6,14 @@
 {% block 'content' %}
 
 <div class="content">
-    <h2>Edit User Information</h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ user_form.as_p }}
-        <button type="submit">Save</button>
-    </form>
+    <div class="content-profile">
+        <h2>Edit User Information</h2>
+        <form method="post" class="form-profile">
+            {% csrf_token %}
+            {{ user_form.as_p }}
+            <button type="submit">Save</button>
+        </form>
+    </div>
 </div>
 
 {% endblock %}

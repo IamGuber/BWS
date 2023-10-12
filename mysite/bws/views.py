@@ -10,13 +10,25 @@ from django.contrib.auth.forms import User
 from django.views.generic.edit import FormMixin
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 
 
 def index(request):
     orders = Order.objects.all()
+    product_counts = Product.objects.annotate(order_count=Count('buyerorder'))
+    sorted_product_counts = product_counts.order_by('-order_count')
+    top_product_counts = sorted_product_counts[:8]
+
+    top_orders = []
+
+    for product_count in top_product_counts:
+        product_type = product_count.name
+        orders_with_product = orders.filter(buyer_info__product__name=product_type)
+        if orders_with_product.exists():
+            top_orders.append(orders_with_product.first())
 
     context = {
-        'orders': orders,
+        'orders': top_orders,
     }
 
     return render(request, 'index.html', context=context)

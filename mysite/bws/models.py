@@ -181,13 +181,19 @@ class BuyerOrder(models.Model):
                 new_number += 1
             self.order_nr = f'BWS{new_number:04}'
 
+        if self.buyer is not None:
+            self.user_client = self.buyer.user_client
+
         super().save(*args, **kwargs)
 
-        order_instance, created = Order.objects.get_or_create(order_nr=self.order_nr)
-        order_instance.buyer_info = self
-        order_instance.order_status = self.status
-        order_instance.user_client = self.buyer.user_client
-        order_instance.save()
+        if self.buyer is not None:
+
+
+            order_instance, created = Order.objects.get_or_create(order_nr=self.order_nr)
+            order_instance.buyer_info = self
+            order_instance.order_status = self.status
+            order_instance.user_client = self.buyer.user_client
+            order_instance.save()
 
         def delete(self, *args, **kwargs):
             if self.order_nr:
