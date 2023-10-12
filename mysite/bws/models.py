@@ -3,6 +3,9 @@ from django.core.validators import RegexValidator
 from django.utils import timezone
 from django.db.models import signals
 from django.contrib.auth.models import User
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth.models import Group
 
 
 class Transport(models.Model):
@@ -23,8 +26,25 @@ class Transport(models.Model):
 
     status = models.CharField(verbose_name='Status', choices=ORDER_STATUS, max_length=1, default='a', blank=True, editable=True)
 
+    MAIL_STATUS = (
+        ('n', 'Not Sent'),
+        ('s', 'Sent Out'),
+    )
+
+    mail = models.CharField(verbose_name='Send Mail', choices=MAIL_STATUS, default='n', max_length=1, blank=True)
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+        if self.mail == 's':
+            leaders_group = Group.objects.get(name='Leaders')
+            leaders_group_emails = leaders_group.user_set.values_list('email', flat=True)
+
+            subject = 'New Transport Order Created'
+            message = f'A new order with order number {self.seller_order} has been created and requires your attention.'
+
+            from_email = settings.DEFAULT_FROM_EMAIL
+            send_mail(subject, message, from_email, leaders_group_emails)
 
         order_instance, created = Order.objects.get_or_create(order_nr=self.seller_order.buyer_order.order_nr)
         order_instance.order_status = self.status
@@ -170,6 +190,13 @@ class BuyerOrder(models.Model):
 
     status = models.CharField(verbose_name='Order Status', choices=ORDER_STATUS, default='a', max_length=1, blank=True)
 
+    MAIL_STATUS = (
+        ('n', 'Not Sent'),
+        ('s', 'Sent Out'),
+    )
+
+    mail = models.CharField(verbose_name='Send Mail', choices=MAIL_STATUS, default='n', max_length=1, blank=True)
+
     def __str__(self):
         return self.order_nr
 
@@ -187,13 +214,21 @@ class BuyerOrder(models.Model):
         super().save(*args, **kwargs)
 
         if self.buyer is not None:
-
-
             order_instance, created = Order.objects.get_or_create(order_nr=self.order_nr)
             order_instance.buyer_info = self
             order_instance.order_status = self.status
             order_instance.user_client = self.buyer.user_client
             order_instance.save()
+
+        if self.buyer is not None and self.mail == 's':
+            sales_managers_group = Group.objects.get(name='Sales managers')
+            sales_managers_emails = sales_managers_group.user_set.values_list('email', flat=True)
+
+            subject = 'New Buyer Order Created'
+            message = f'A new order with order number {self.order_nr} has been created and requires your attention.'
+
+            from_email = settings.DEFAULT_FROM_EMAIL
+            send_mail(subject, message, from_email, sales_managers_emails)
 
         def delete(self, *args, **kwargs):
             if self.order_nr:
@@ -235,8 +270,25 @@ class SellerOrder(models.Model):
 
     status = models.CharField(verbose_name='Order Status', choices=ORDER_STATUS, default='a', max_length=1, blank=True)
 
+    MAIL_STATUS = (
+        ('n', 'Not Sent'),
+        ('s', 'Sent Out'),
+    )
+
+    mail = models.CharField(verbose_name='Send Mail', choices=MAIL_STATUS, default='n', max_length=1, blank=True)
+
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
+
+        if self.mail == 's':
+            transport_managers_group = Group.objects.get(name='Transport managers')
+            transport_managers_emails = transport_managers_group.user_set.values_list('email', flat=True)
+
+            subject = 'New Seller Order Created'
+            message = f'A new order with order number {self.buyer_order} has been created and requires your attention.'
+
+            from_email = settings.DEFAULT_FROM_EMAIL
+            send_mail(subject, message, from_email, transport_managers_emails)
 
         order_instance, created = Order.objects.get_or_create(order_nr=self.buyer_order.order_nr)
         order_instance.seller_info = self

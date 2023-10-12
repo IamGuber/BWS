@@ -11,6 +11,9 @@ from django.views.generic.edit import FormMixin
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
+from django.conf import settings
+from django.core.mail import send_mail
+from django.contrib.auth.models import Group
 
 
 def index(request):
@@ -79,6 +82,7 @@ class ProductDetailView(FormMixin, generic.DetailView):
         self.object = self.get_object()
         form = self.get_form()
         if form.is_valid():
+            messages.info(request, f"Product {self.object.name} is ordered.")
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
@@ -87,6 +91,21 @@ class ProductDetailView(FormMixin, generic.DetailView):
         form.instance.product = self.object
         form.instance.buyer = self.request.user.buyer
         form.save()
+
+        purchasing_managers_group = Group.objects.get(name='Purchasing managers')
+        purchasing_managers_emails = purchasing_managers_group.user_set.values_list('email', flat=True)
+
+        subject = f'New Order: {self.object.name}'
+        message = f'A new order has been placed for the product: {self.object.name}.\n\nOrder details:\n{form.instance}'
+
+        from_email = settings.DEFAULT_FROM_EMAIL
+        recipient_list = [manager.email for manager in Group.objects.get(name='Purchasing managers').user_set.all()]
+
+        from_email = settings.DEFAULT_FROM_EMAIL
+        send_mail(subject, message, from_email, purchasing_managers_emails)
+
+        messages.info(self.request, f"Please wait for a manager to contact you.")
+
         return super().form_valid(form)
 
     def get_object(self, queryset=None):
@@ -104,7 +123,7 @@ class UserOrdersListView(LoginRequiredMixin, generic.ListView):
         order_number = self.request.GET.get('order_number')
         order_status = self.request.GET.get('order_status')
         delivery_date = self.request.GET.get('delivery_date')
-
+        product_name = self.request.GET.get('product_name')
 
         if order_number:
             queryset = queryset.filter(order_nr__icontains=order_number)
@@ -112,6 +131,8 @@ class UserOrdersListView(LoginRequiredMixin, generic.ListView):
             queryset = queryset.filter(order_status=order_status)
         if delivery_date:
             queryset = queryset.filter(transport_unload_date__unloading_date=delivery_date)
+        if product_name:
+            queryset = queryset.filter(buyer_info__product__name__icontains=product_name)
         return queryset
 
 

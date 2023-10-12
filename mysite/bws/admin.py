@@ -1,6 +1,21 @@
 from django.contrib import admin
 from .models import Product, Buyer, Seller, BuyerOrder, SellerOrder, Trailer, Order, Transport, TransportCompany
 from .forms import BuyerOrderForm
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth.models import Group
+from django.http import HttpResponse, HttpResponseRedirect
+
+
+def send_buyerorder_email(modeladmin, request, queryset):
+    ...
+
+def send_sellerorder_email(modeladmin, request, queryset):
+    ...
+
+
+def send_transportorder_email(modeladmin, request, queryset):
+    ...
 
 
 class TransportAdmin(admin.ModelAdmin):
@@ -9,6 +24,7 @@ class TransportAdmin(admin.ModelAdmin):
         'transport_company',
         'truck_plates',
         'status',
+        'mail',
     )
 
     readonly_fields = (
@@ -35,7 +51,6 @@ class TransportAdmin(admin.ModelAdmin):
                 'loading_date',
                 'unloading_date',
                 'info',
-                'status',
             )
         }),
         ('Production and Loading Information', {
@@ -56,6 +71,16 @@ class TransportAdmin(admin.ModelAdmin):
                 'get_buyer_product',
                 'get_buyer_date',
             )
+        }),
+        ('Status', {
+            'fields': (
+                'status',
+            ),
+        }),
+        ('Mail Send Status', {
+            'fields': (
+                'mail',
+            ),
         }),
     )
 
@@ -246,10 +271,12 @@ class OrderAdmin(admin.ModelAdmin):
 
 class BuyerOrderAdmin(admin.ModelAdmin):
     form = BuyerOrderForm
+
     list_display = (
         'order_nr',
         'buyer',
         'product',
+        'mail',
     )
 
     fieldsets = (
@@ -268,6 +295,11 @@ class BuyerOrderAdmin(admin.ModelAdmin):
                 'status',
             ),
         }),
+        ('Mail Send Status', {
+            'fields': (
+                'mail',
+            ),
+        }),
     )
 
 
@@ -280,6 +312,7 @@ class SellerOrderAdmin(admin.ModelAdmin):
         'buyer_order',
         'seller',
         'production_product',
+        'mail',
     )
     readonly_fields = (
         'capacity_calculation',
@@ -331,6 +364,11 @@ class SellerOrderAdmin(admin.ModelAdmin):
         ('Status', {
             'fields': (
                 'status',
+            ),
+        }),
+        ('Mail Send Status', {
+            'fields': (
+                'mail',
             ),
         }),
     )

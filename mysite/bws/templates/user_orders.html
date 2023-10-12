@@ -12,6 +12,9 @@
         <label for="order_number">Order Number:</label>
         <input type="text" id="order_number" name="order_number" value="{{ request.GET.order_number }}">
 
+        <label for="product_name">Product Name:</label>
+        <input type="text" id="product_name" name="product_name" value="{{ request.GET.product_name }}">
+
         <label for="order_status">Order Status:</label>
         <select id="order_status" name="order_status">
             <option value="">All</option>
@@ -33,6 +36,7 @@
     <table>
         <tr>
             <th>Order Number</th>
+            <th>Product</th>
             <th>Price</th>
             <th>Production Date</th>
             <th>Truck Plates</th>
@@ -43,6 +47,7 @@
         {% for order in user_orders %}
         <tr>
             <td>{{ order.order_nr }}</td>
+            <td>{{ order.buyer_info.product }}</td>
             {% if order.price %}
             <td>{{ order.price }}</td>
             {% else %}
@@ -60,5 +65,6 @@
         </tr>
         {% endfor %}
     </table>
+    <br>
 </div>
 {% endblock %}
