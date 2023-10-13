@@ -198,7 +198,12 @@ class OrderAdmin(admin.ModelAdmin):
                 'get_transport_load_date',
                 'get_transport_unload_date',
             )
-        })
+        }),
+        ('Download File', {
+            'fields': (
+                'export_format',
+            ),
+        }),
     )
 
     def get_product(self, obj):

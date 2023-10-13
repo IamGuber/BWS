@@ -6,6 +6,9 @@ from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.models import Group
+import os
+import mimetypes
+from django.http import HttpResponse
 
 
 class Transport(models.Model):
@@ -347,6 +350,78 @@ class Order(models.Model):
     )
 
     order_status = models.CharField(verbose_name='Status', choices=ORDER_STATUS, max_length=20, blank=True, editable=False)
+
+    EXPORT_FORMAT_CHOICES = (
+        ('csv', 'CSV'),
+    )
+
+    export_format = models.CharField(verbose_name='Export Format', choices=EXPORT_FORMAT_CHOICES, max_length=10, default=None, blank=True, null=True)
+
+    def save_order(request):
+        order = Order(...)
+        order.save()
+
+        file_path = order.save_export_file()
+
+        with open(file_path, 'rb') as file:
+            response = HttpResponse(file.read(), content_type=mimetypes.guess_type(file_path)[0])
+            response['Content-Disposition'] = f'attachment; filename="{file_path}"'
+
+        return response
+
+    def save(self, *args, **kwargs):
+        file_path = None
+        super().save(*args, **kwargs)
+
+        if self.export_format == 'csv':
+            file_path = self.save_export_file()
+
+        return file_path
+
+    def save_export_file(self):
+        if self:
+            export_content = f"Order Number: {self.order_nr}\n"
+        else:
+            export_content += "Order Number: \n"
+        if self.buyer_info:
+            export_content += f"Buyer: {self.buyer_info.buyer}\n"
+        else:
+            export_content += "Buyer: \n"
+        if self.buyer_info:
+            export_content += f"Product: {self.buyer_info.product}\n"
+        else:
+            export_content += "Product: \n"
+        if self.price:
+            export_content += f"Price: {self.price}\n"
+        else:
+            export_content += "Price: \n"
+        if self.seller_info:
+            export_content += f"Seller: {self.seller_info.seller}\n"
+        else:
+            export_content += "Seller: \n"
+        if self.transport:
+            export_content += f"Transport Company: {self.transport}\n"
+        else:
+            export_content += "Transport Company: \n"
+        if self.transport_plates:
+            export_content += f"Truck Plates: {self.transport_plates.truck_plates}\n"
+        else:
+            export_content += "Truck Plates: \n"
+        if self.transport_load_date:
+            export_content += f"Loading Date: {self.transport_load_date.loading_date}\n"
+        else:
+            export_content += "Loading Date: \n"
+        if self.transport_unload_date:
+            export_content += f"Unloading Date: {self.transport_unload_date.unloading_date}\n"
+        else:
+            export_content += "Unloading Date: \n"
+
+        file_path = os.path.join("", f"order_{self.order_nr}.{self.export_format}")
+
+        with open(file_path, "w") as file:
+            file.write(export_content)
+
+        return file_path
 
     def __str__(self):
         return self.order_nr
