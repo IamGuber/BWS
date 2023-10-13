@@ -1,5 +1,5 @@
 from django import forms
-from .models import BuyerOrder, Product, Buyer
+from .models import BuyerOrder, Product, Buyer, SellerOrder
 from django.contrib.auth.models import User
 
 
@@ -8,6 +8,16 @@ class ProductFilterForm(forms.Form):
     length = forms.IntegerField(required=False)
     height = forms.IntegerField(required=False)
     thickness = forms.IntegerField(required=False)
+
+
+class SellerOrderForm(forms.ModelForm):
+    class Meta:
+        model = SellerOrder
+        fields = ['production_product']
+
+    def __init__(self, *args, **kwargs):
+        super(SellerOrderForm, self).__init__(*args, **kwargs)
+        self.fields['production_product'].queryset = Product.objects.filter(name__icontains='n')
 
 
 class BuyerOrderForm(forms.ModelForm):

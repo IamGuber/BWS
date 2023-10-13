@@ -18,13 +18,13 @@ class Transport(models.Model):
     info = models.TextField(verbose_name='Additional Information', max_length=2000, default='Transport Additional Information')
 
     ORDER_STATUS = (
-        ('a', 'Accepted'),
+        ('p', 'In produce'),
         ('l', 'Loaded'),
         ('y', 'Delivered'),
         ('d', 'Declined'),
     )
 
-    status = models.CharField(verbose_name='Status', choices=ORDER_STATUS, max_length=1, default='a', blank=True, editable=True)
+    status = models.CharField(verbose_name='Status', choices=ORDER_STATUS, max_length=1, default='p', blank=True, editable=True)
 
     MAIL_STATUS = (
         ('n', 'Not Sent'),

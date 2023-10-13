@@ -1,21 +1,6 @@
 from django.contrib import admin
 from .models import Product, Buyer, Seller, BuyerOrder, SellerOrder, Trailer, Order, Transport, TransportCompany
-from .forms import BuyerOrderForm
-from django.core.mail import send_mail
-from django.conf import settings
-from django.contrib.auth.models import Group
-from django.http import HttpResponse, HttpResponseRedirect
-
-
-def send_buyerorder_email(modeladmin, request, queryset):
-    ...
-
-def send_sellerorder_email(modeladmin, request, queryset):
-    ...
-
-
-def send_transportorder_email(modeladmin, request, queryset):
-    ...
+from .forms import BuyerOrderForm, SellerOrderForm
 
 
 class TransportAdmin(admin.ModelAdmin):
@@ -308,6 +293,8 @@ class ProductAdmin(admin.ModelAdmin):
 
 
 class SellerOrderAdmin(admin.ModelAdmin):
+    form = SellerOrderForm
+
     list_display = (
         'buyer_order',
         'seller',

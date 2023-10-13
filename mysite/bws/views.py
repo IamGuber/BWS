@@ -92,17 +92,14 @@ class ProductDetailView(FormMixin, generic.DetailView):
         form.instance.buyer = self.request.user.buyer
         form.save()
 
-        purchasing_managers_group = Group.objects.get(name='Purchasing managers')
-        purchasing_managers_emails = purchasing_managers_group.user_set.values_list('email', flat=True)
+        seller_managers_group = Group.objects.get(name='Seller managers')
+        seller_managers_emails = seller_managers_group.user_set.values_list('email', flat=True)
 
         subject = f'New Order: {self.object.name}'
         message = f'A new order has been placed for the product: {self.object.name}.\n\nOrder details:\n{form.instance}'
 
         from_email = settings.DEFAULT_FROM_EMAIL
-        recipient_list = [manager.email for manager in Group.objects.get(name='Purchasing managers').user_set.all()]
-
-        from_email = settings.DEFAULT_FROM_EMAIL
-        send_mail(subject, message, from_email, purchasing_managers_emails)
+        send_mail(subject, message, from_email, seller_managers_emails)
 
         messages.info(self.request, f"Please wait for a manager to contact you.")
 
