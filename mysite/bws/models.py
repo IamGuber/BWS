@@ -224,14 +224,14 @@ class BuyerOrder(models.Model):
             order_instance.save()
 
         if self.buyer is not None and self.mail == 's':
-            sales_managers_group = Group.objects.get(name='Sales managers')
-            sales_managers_emails = sales_managers_group.user_set.values_list('email', flat=True)
+            purchasing_managers_group = Group.objects.get(name='Purchasing managers')
+            purchasing_managers_emails = purchasing_managers_group.user_set.values_list('email', flat=True)
 
             subject = 'New Buyer Order Created'
             message = f'A new order with order number {self.order_nr} has been created and requires your attention.'
 
             from_email = settings.DEFAULT_FROM_EMAIL
-            send_mail(subject, message, from_email, sales_managers_emails)
+            send_mail(subject, message, from_email, purchasing_managers_emails)
 
         def delete(self, *args, **kwargs):
             if self.order_nr:
